@@ -1,0 +1,67 @@
+﻿<Window x:Class="Launcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Launcher"
+        mc:Ignorable="d"
+        Height="400" Width="500" WindowStartupLocation="CenterScreen" Icon="/hamburger.ico"
+        Closing="Window_Closing"
+        Loaded="Window_Loaded" 
+        Title=""
+>
+    <Grid Margin="10,10,10,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+            <Image x:Name="newShortcutIcon" Grid.Column="0" Visibility="Hidden" Width="32px" Height="32px"/>
+            <TextBox 
+                x:Name="DDBox"
+                MouseDown="DDBox_MouseDown"
+                AllowDrop="True"
+                Drop="DDBox_Drop"
+                PreviewDragOver="DDBox_PreviewDragOver"
+                AcceptsReturn="True" 
+                TextWrapping="Wrap" 
+                Grid.Column="1" 
+                Margin="0,0,0,0" 
+                HorizontalContentAlignment="Center" 
+                VerticalContentAlignment="Center" 
+                Height="60" Foreground="#FF787878"
+            >
+                Drag &amp; Drop new shortcut here !
+            </TextBox>
+            <Button x:Name="btnAdd" Grid.Column="2" Visibility="Hidden" Click="btnAdd_Click" Margin="10,10,10,10">Add</Button>
+        </Grid>
+
+
+        <ListBox x:Name="Shortcuts" BorderThickness="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="0,10,0,0" ItemsSource="{Binding _shortcuts}" HorizontalContentAlignment="Stretch" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid MouseEnter="Grid_MouseEnter">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image Grid.Column="0" Source="{Binding Icon}" Width="32px"/>
+                        <Label Grid.Column="1" Content="{Binding Name}" />
+                        <Image Grid.Column="2" Width="32px" MouseDown="Button_Click" Source="Poubelle.png" Opacity="0.2"/>
+
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBox x:Name="txtPath" Grid.Row="2" BorderThickness="0"></TextBox>
+        
+    </Grid>
+</Window>
