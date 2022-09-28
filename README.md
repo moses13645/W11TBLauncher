@@ -8,6 +8,7 @@ This piece of code will help you to add extra shortcuts menu to Windows 11 Taskb
 HOW TO USE IT:
 1. Run the program.
 2. Click the "Pin-to-taskbar" context menu.
+
 ![image](https://user-images.githubusercontent.com/22561765/192773639-aacb5c14-377f-42a8-a66b-da7697f82f04.png)
 
 3. Drag & Drop exe files or folders to the App main windows to add shortcuts to the App's taskbar right-click context menu.
