@@ -25,7 +25,6 @@
             <Image x:Name="newShortcutIcon" Grid.Column="0" Visibility="Hidden" Width="32px" Height="32px"/>
             <TextBox 
                 x:Name="DDBox"
-                MouseDown="DDBox_MouseDown"
                 AllowDrop="True"
                 Drop="DDBox_Drop"
                 PreviewDragOver="DDBox_PreviewDragOver"

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,9 +22,14 @@ using System.Windows.Shapes;
 using System.Windows.Shell;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Xml.Xsl;
 
 namespace Launcher
 {
+
+
+
+
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
     /// </summary>
@@ -37,9 +43,10 @@ namespace Launcher
 
             if (System.IO.File.Exists("Data.xml"))
             {
+                // Load save shortcut list
                 LoadData();
             }
-            else
+            else    // First run if no data file exists, just create one
             {
                 _shortcuts.Add(
                     new Shortcut
@@ -59,18 +66,12 @@ namespace Launcher
                         Name = "Internet Explorer",
                         Path = @"C:\Program Files\Internet Explorer\iexplore.exe"
                     });
-                _shortcuts.Add(
-                    new Shortcut
-                    {
-                        Name = "Road To Home",
-                        Path = @"C:\Users\M.ZAPATER\sources\repos\RoadToHome\RoadToHome\bin\Debug\RoadToHome.exe"
-                    });
 
                 SaveData();
             }
 
         }
-
+        // Load data file
         private void LoadData()
         {
             DataContractSerializer x = new DataContractSerializer(_shortcuts.GetType());
@@ -81,47 +82,50 @@ namespace Launcher
             {
                 _shortcuts.Add(shortcut);
             }
-    
         }
-
+    
+        // Save Data to file
         private void SaveData()
         {
-            // Save Data to file
             DataContractSerializer x = new DataContractSerializer(_shortcuts.GetType());
 
             System.IO.FileStream file = System.IO.File.Create("Data.xml");
             x.WriteObject(file, _shortcuts);
             file.Close();
         }
-
-        private void DDBox_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Console.WriteLine("MouseDown");
-        }
-    
+        
+        // Handle File Drop
         private void DDBox_Drop(object sender, DragEventArgs e)
         {
             if(e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
+                // Extract dropped data and display itin the textbox to let user modufy them if needed
+                // DDBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0));
                 DDBox.Text = System.IO.Path.GetFileNameWithoutExtension(files[0]);
                 DDBox.Text += "\r\n" + files[0];
                 btnAdd.Visibility = Visibility.Visible;
                 newShortcutIcon.Visibility = Visibility.Visible;
+                // Extract Icon if found
                 try
                 {
                     Icon i = System.Drawing.Icon.ExtractAssociatedIcon(files[0]);
                     newShortcutIcon.Source = Imaging.CreateBitmapSourceFromHIcon(i.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                }catch (Exception)
+                } catch (Exception)
                 {
+                    // get the file attributes for file or directory
+                    FileAttributes attr = File.GetAttributes(files[0]);
 
-                }
-                
-                DDBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0));
+                    //detect whether its a directory or file
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                    {
+                        newShortcutIcon.Source = Imaging.CreateBitmapSourceFromHIcon(((Icon)StockIcon.GetStockIcon(StockIcon.SHSIID_FOLDER, StockIcon.SHGSI_LARGEICON)).Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    }
+                }  
             }
         }
-
+        
         private void DDBox_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Handled = true;
@@ -130,9 +134,9 @@ namespace Launcher
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
+            // Add new shortcut to the JumpList
             btnAdd.Visibility = Visibility.Hidden;
             newShortcutIcon.Visibility=Visibility.Hidden;
-
 
             string [] data = DDBox.Text.Split('\n');
 
@@ -144,9 +148,11 @@ namespace Launcher
 
             DDBox.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(120,120,120) ); 
             DDBox.Text = "Drag & Drop new shortcut here !";
+
             SetJumpList();
         }
 
+        // Delete JumpListItem when Del button is pressed
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Console.WriteLine(sender.ToString());
@@ -155,6 +161,7 @@ namespace Launcher
             SetJumpList();
         }
 
+        // Fix item auto selection
         private void Grid_MouseEnter(object sender, MouseEventArgs e)
         {
             Shortcuts.SelectedItem = (sender as Grid).DataContext;
@@ -163,17 +170,20 @@ namespace Launcher
                 Shortcuts.Focus();
         }
 
+        // Save to disk before closing
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             SaveData();
         }
 
+        // Jumplist cannot be set in class constructor the window should have been displayed first
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetJumpList();
 
         }
 
+        // Set Jumplist based on saved data
         private void SetJumpList()
         {
             var currentJumplist = JumpList.GetJumpList(App.Current);
@@ -186,17 +196,37 @@ namespace Launcher
 
             foreach (Shortcut shortcut in _shortcuts)
             {
-                currentJumplist.JumpItems.Add(new JumpTask
-                {
-                    ApplicationPath = shortcut.Path,
-                    Title = shortcut.Name,
-                    CustomCategory = "Links",
-                    IconResourcePath = shortcut.Path
+                FileAttributes attr = File.GetAttributes(shortcut.Path);
 
-                });
+                //detect whether its a directory or file
+                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    currentJumplist.JumpItems.Add(new JumpTask
+                    {
+                        ApplicationPath = shortcut.Path,
+                        Title = shortcut.Name,
+                        CustomCategory = "Links",
+                        IconResourcePath = "shell32.dll",
+                        IconResourceIndex = 3
+
+                    });
+                }
+                else
+                {
+                    currentJumplist.JumpItems.Add(new JumpTask
+                    {
+                        ApplicationPath = shortcut.Path,
+                        Title = shortcut.Name,
+                        CustomCategory = "Links",
+                        IconResourcePath = shortcut.Path
+
+                    });
+                }
+               
             }
             currentJumplist.Apply();
             JumpList.SetJumpList(App.Current, currentJumplist);
+            
         }
 
     }

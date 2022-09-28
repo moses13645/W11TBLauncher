@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
 using System.Windows;
+using System.IO;
+using System.Windows.Shell;
 
 namespace Launcher
 {
@@ -24,8 +26,18 @@ namespace Launcher
                 {
                     try
                     {
-                        _icon = System.Drawing.Icon.ExtractAssociatedIcon(Path);
-                     
+                        FileAttributes attr = File.GetAttributes(Path);
+
+                        //detect whether its a directory or file
+                        if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                            _icon =StockIcon.GetStockIcon(StockIcon.SHSIID_FOLDER, StockIcon.SHGSI_LARGEICON);
+
+                        }
+                        else
+                        {
+                             _icon = System.Drawing.Icon.ExtractAssociatedIcon(Path);
+                        }
                     }
                     catch
                     {
