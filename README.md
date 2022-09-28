@@ -1,7 +1,7 @@
 # W11TBLauncher
 
 As you may have used in the past, windows 10 had the ability to support custom taskbars.
-This as desappeared from Windows 11 new GUI.
+This as disappeared from Windows 11 new GUI.
 
 This piece of code will help you to add extra shortcuts menu to Windows 11 Taskbar.
 
