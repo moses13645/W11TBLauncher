@@ -12,4 +12,4 @@ HOW TO USE IT:
 4. Close the App.
 5. Enjoy the App's taskbar right-click context menu filled with the new shortcuts.
 
-
+![image](https://user-images.githubusercontent.com/22561765/192773370-7a6b8ff3-e734-4ab8-b098-8b1ca1380a0b.png)
