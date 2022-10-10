@@ -12,6 +12,7 @@ HOW TO USE IT:
 ![image](https://user-images.githubusercontent.com/22561765/192773639-aacb5c14-377f-42a8-a66b-da7697f82f04.png)
 
 3. Drag & Drop exe files or folders to the App main windows to add shortcuts to the App's taskbar right-click context menu.
+
 ![image](https://user-images.githubusercontent.com/22561765/192773891-d528c261-0e59-446f-92ea-9d0fe0bd7522.png)
 
 4. Close the App.
